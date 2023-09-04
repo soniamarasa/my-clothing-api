@@ -7,6 +7,6 @@ const tagSchema = mongoose.Schema({
   icon: String,
 });
 
-const tagModel = mongoose.model('tag', tagSchema);
+const tagModel = mongoose.model('handbag', tagSchema);
 
 export default tagModel;

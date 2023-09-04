@@ -6,8 +6,17 @@ import dotenv from 'dotenv';
 //Routes
 import authRoutes from './routes/auth.routes.js';
 import userRoutes from './routes/user.routes.js';
+
+import accessoryRouter from './routes/accessory.routes.js';
+import bandanaRouter from './routes/bandana.routes.js';
 import categoriesRouter from './routes/categories.routes.js';
-import tagsRouter from './routes/tags.routes.js';
+import clothingRouter from './routes/clothing.routes.js';
+import handbagRouter from './routes/handbag.routes.js';
+import looksRouter from './routes/look.routes.js';
+import placeRouter from './routes/place.routes.js';
+import plannedLooksRouter from './routes/plannedLook.routes.js';
+import shoeRouter from './routes/shoe.routes.js';
+import tagsRouter from './routes/tag.routes.js';
 
 dotenv.config();
 const app = express();
@@ -34,5 +43,13 @@ mongoose.connection.once('open', () => {
 
 app.use('/api', authRoutes);
 app.use('/api', userRoutes);
+app.use('/api', accessoryRouter);
+app.use('/api', bandanaRouter);
 app.use('/api', categoriesRouter);
+app.use('/api', clothingRouter);
+app.use('/api', handbagRouter);
+app.use('/api', looksRouter);
+app.use('/api', placeRouter);
+app.use('/api', plannedLooksRouter);
+app.use('/api', shoeRouter);
 app.use('/api', tagsRouter);
