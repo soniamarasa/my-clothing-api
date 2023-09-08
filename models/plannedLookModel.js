@@ -6,7 +6,7 @@ const plannedLookSchema = mongoose.Schema({
   date: String,
   status: String,
   place: Object,
-  plannedLook: Object,
+  tag: Object,
 });
 
 const plannedLookModel = mongoose.model('plannedLook', plannedLookSchema);
