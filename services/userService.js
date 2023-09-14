@@ -12,10 +12,8 @@ const createAccount = async (req, res) => {
     email: Yup.string().email().required(),
     password: Yup.string().required().min(8),
     name: Yup.string().required(),
-    username: Yup.string().required(),
     birthdate: Yup.date().required(),
     gender: Yup.string().required(),
-    // imgUrl: Yup.string(),
   });
 
   if (!(await schema.isValid(req.body)))
@@ -68,7 +66,7 @@ const login = async (req, res) => {
         userExists;
       return res.json({
         user: {
-          id: _id,
+          _id,
           name,
           email,
           gender,
@@ -86,10 +84,10 @@ const login = async (req, res) => {
 };
 
 const logout = async (req, res) => {
-  let { id } = req.body;
+  const userId = req.userId;
 
   const userExists = await userModel.findById({
-    _id: id,
+    _id: userId,
   });
 
   if (!userExists)
@@ -121,7 +119,6 @@ const updateUser = async (req, res) => {
     email,
     password,
     name,
-    imgUrl,
     gender,
     birthdate,
     oldPassword,
@@ -136,7 +133,6 @@ const updateUser = async (req, res) => {
     email: Yup.string().email(),
     birthdate: Yup.date(),
     gender: Yup.string(),
-    imgUrl: Yup.string(),
     oldPassword: Yup.string().min(6),
     password: Yup.string()
       .min(6)
@@ -224,7 +220,7 @@ const recoverPassword = async (req, res) => {
   if (!userExists)
     return res.status(400).json({ error: 'Usuário não existe!' });
   else {
-    let token = jwt.sign({ _id: userExists._id }, process.env.SECRET, {
+    let token = jwt.sign({ _id: userExists.id }, process.env.SECRET, {
       expiresIn: '2h',
     });
 
