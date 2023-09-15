@@ -6,7 +6,7 @@ const lookSchema = mongoose.Schema({
   top: Object, 
   shoe: Object, 
   dress: Object,
-  accessory: Object,
+  accessory: Array,
   handbag: Object,
   bandana: Object,
   coat: Object

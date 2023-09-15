@@ -4,7 +4,8 @@ const shoeSchema = mongoose.Schema({
   userId: String,
   name: String,
   color: String,
-  icon: String,
+  type: Object,
+  // icon: String,
 });
 
 const shoeModel = mongoose.model('shoe', shoeSchema);

@@ -9,9 +9,9 @@ import { authorization } from '../services/userService.js';
 
 const clothingRouter = express.Router();
 
-clothingRouter.get('/clothes', authorization, getClothes); 
-clothingRouter.post('/clothing', authorization, newClothing);
-clothingRouter.put('/clothing/:id', authorization, updateClothing);
-clothingRouter.delete('/clothing/:id', authorization, deleteClothing);
+clothingRouter.get('/clothes', authorization, getClothes);
+clothingRouter.post('/clothes', authorization, newClothing);
+clothingRouter.put('/clothes/:id', authorization, updateClothing);
+clothingRouter.delete('/clothes/:id', authorization, deleteClothing);
 
 export default clothingRouter;

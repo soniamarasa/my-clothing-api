@@ -4,7 +4,7 @@ const bandanaSchema = mongoose.Schema({
   userId: String,
   name: String,
   color: String,
-  icon: String,
+  // icon: String,
 });
 
 const bandanaModel = mongoose.model('bandana', bandanaSchema);

@@ -10,8 +10,8 @@ import { authorization } from '../services/userService.js';
 const handbagRouter = express.Router();
 
 handbagRouter.get('/handbags', authorization, getHandbags); 
-handbagRouter.post('/handbag', authorization, newHandbag);
-handbagRouter.put('/handbag/:id', authorization, updateHandbag);
-handbagRouter.delete('/handbag/:id', authorization, deleteHandbag);
+handbagRouter.post('/handbags', authorization, newHandbag);
+handbagRouter.put('/handbags/:id', authorization, updateHandbag);
+handbagRouter.delete('/handbags/:id', authorization, deleteHandbag);
 
 export default handbagRouter;
