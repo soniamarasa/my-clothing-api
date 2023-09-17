@@ -22,10 +22,7 @@ const newLook = async (req, res) => {
 
   try {
     await look.save();
-    look = {
-      look,
-      message: `Look criado com sucesso!`,
-    };
+
     res.send(look);
   } catch (error) {
     res.status(500).send({
@@ -66,10 +63,7 @@ const updateLook = async (req, res) => {
         message: 'Look não encontrado',
       });
     } else {
-      look = {
-        look,
-        message: `Look atualizado com sucesso!`,
-      };
+   
       res.send(look);
     }
   } catch (error) {

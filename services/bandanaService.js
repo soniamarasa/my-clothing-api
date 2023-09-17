@@ -22,10 +22,7 @@ const newBandana = async (req, res) => {
 
   try {
     await bandana.save();
-    bandana = {
-      bandana,
-      message: `Bandana criada com sucesso!`,
-    };
+
     res.send(bandana);
   } catch (error) {
     res.status(500).send({
@@ -66,10 +63,6 @@ const updateBandana = async (req, res) => {
         message: 'Bandana não encontrado',
       });
     } else {
-      bandana = {
-        bandana,
-        message: `Bandana atualizada com sucesso!`,
-      };
       res.send(bandana);
     }
   } catch (error) {

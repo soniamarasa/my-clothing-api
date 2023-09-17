@@ -1,13 +1,11 @@
 import categoryModel from '../models/categoryModel.js';
 
 const getCategories = async (req, res) => {
-  const type = !req.query.type ? 1 : req.query.type;
   const userId = req.userId;
   
   try {
     let categories = await categoryModel.find({
       userId: userId,
-      type: type
     })
     res.send(categories);
   } catch (error) {
@@ -25,10 +23,7 @@ const newCategory = async (req, res) => {
 
   try {
     await category.save();
-    category = {
-      category,
-      message: `Categoria criada com sucesso!`,
-    };
+   
     res.send(category);
   } catch (error) {
     res.status(500).send({
@@ -70,10 +65,6 @@ const updateCategory = async (req, res) => {
         message: 'Categoria não encontrada',
       });
     } else {
-      category = {
-        category,
-        message: `Categoria atualizada com sucesso!`,
-      };
       res.send(category);
     }
   } catch (error) {

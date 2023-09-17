@@ -22,10 +22,7 @@ const newPlannedLook = async (req, res) => {
 
   try {
     await plannedLook.save();
-    plannedLook = {
-      plannedLook,
-      message: `Look planejado com sucesso!`,
-    };
+
     res.send(plannedLook);
   } catch (error) {
     res.status(500).send({
@@ -66,10 +63,7 @@ const updatePlannedLook = async (req, res) => {
         message: 'Look planejado não encontrado',
       });
     } else {
-      plannedLook = {
-        plannedLook,
-        message: `Look planejado atualizado com sucesso!`,
-      };
+
       res.send(plannedLook);
     }
   } catch (error) {

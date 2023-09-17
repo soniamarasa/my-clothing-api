@@ -22,10 +22,7 @@ const newShoe = async (req, res) => {
 
   try {
     await shoe.save();
-    shoe = {
-      shoe,
-      message: `Sapato criado com sucesso!`,
-    };
+
     res.send(shoe);
   } catch (error) {
     res.status(500).send({
@@ -66,10 +63,7 @@ const updateShoe = async (req, res) => {
         message: 'Sapato não encontrado',
       });
     } else {
-      shoe = {
-        shoe,
-        message: `Sapato atualizado com sucesso!`,
-      };
+
       res.send(shoe);
     }
   } catch (error) {

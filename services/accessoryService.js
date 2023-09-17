@@ -22,10 +22,6 @@ const newAccessory = async (req, res) => {
 
   try {
     await accessory.save();
-    accessory = {
-      accessory,
-      message: `Acessório criado com sucesso!`,
-    };
     res.send(accessory);
   } catch (error) {
     res.status(500).send({
@@ -66,10 +62,6 @@ const updateAccessory = async (req, res) => {
         message: 'Acessório não encontrado',
       });
     } else {
-      accessory = {
-        accessory,
-        message: `Acessório atualizado com sucesso!`,
-      };
       res.send(accessory);
     }
   } catch (error) {

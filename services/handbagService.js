@@ -22,10 +22,7 @@ const newHandbag = async (req, res) => {
 
   try {
     await handbag.save();
-    handbag = {
-      handbag,
-      message: `Bolsa criada com sucesso!`,
-    };
+
     res.send(handbag);
   } catch (error) {
     res.status(500).send({
@@ -65,10 +62,7 @@ const updateHandbag = async (req, res) => {
         message: 'Bolsa não encontrada',
       });
     } else {
-      handbag = {
-        handbag,
-        message: `Bolsa atualizada com sucesso!`,
-      };
+
       res.send(handbag);
     }
   } catch (error) {

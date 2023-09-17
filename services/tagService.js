@@ -22,15 +22,11 @@ const newTag = async (req, res) => {
 
   try {
     await tag.save();
-    tag = {
-      tag,
-      message: `Tag criada com sucesso!`,
-    };
+
     res.send(tag);
   } catch (error) {
     res.status(500).send({
-      message:
-        'Um erro ocorreu ao criar a tag. Tente novamente mais tarde. '
+      message: 'Um erro ocorreu ao criar a tag. Tente novamente mais tarde. ',
     });
   }
 };
@@ -66,16 +62,12 @@ const updateTag = async (req, res) => {
         message: 'Tag não encontrada',
       });
     } else {
-      tag = {
-        tag,
-        message: `Tag atualizada com sucesso!`,
-      };
       res.send(tag);
     }
   } catch (error) {
     res.status(500).send({
       message:
-        'Um erro ocorreu ao atualizar a tag. Tente novamente mais tarde.' 
+        'Um erro ocorreu ao atualizar a tag. Tente novamente mais tarde.',
     });
   }
 };
@@ -107,8 +99,7 @@ const deleteTag = async (req, res) => {
   } catch (error) {
     res.status(500).send({
       message:
-        'Um erro ocorreu ao deletar a tag. Tente novamente mais tarde.' +
-        error,
+        'Um erro ocorreu ao deletar a tag. Tente novamente mais tarde.' + error,
     });
   }
 };

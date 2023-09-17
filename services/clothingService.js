@@ -22,10 +22,7 @@ const newClothing = async (req, res) => {
 
   try {
     await clothing.save();
-    clothing = {
-      clothing,
-      message: `Roupa criada com sucesso!`,
-    };
+
     res.send(clothing);
   } catch (error) {
     res.status(500).send({
@@ -66,10 +63,7 @@ const updateClothing = async (req, res) => {
         message: 'Roupa não encontrada',
       });
     } else {
-      clothing = {
-        clothing,
-        message: `Roupa atualizada com sucesso!`,
-      };
+
       res.send(clothing);
     }
   } catch (error) {

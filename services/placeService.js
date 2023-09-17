@@ -22,15 +22,11 @@ const newPlace = async (req, res) => {
 
   try {
     await place.save();
-    place = {
-      place,
-      message: `Local criado com sucesso!`,
-    };
+
     res.send(place);
   } catch (error) {
     res.status(500).send({
-      message:
-        'Um erro ocorreu ao criar o local. Tente novamente mais tarde. '
+      message: 'Um erro ocorreu ao criar o local. Tente novamente mais tarde. ',
     });
   }
 };
@@ -66,16 +62,12 @@ const updatePlace = async (req, res) => {
         message: 'Local não encontrado',
       });
     } else {
-      place = {
-        place,
-        message: `Local atualizado com sucesso!`,
-      };
       res.send(place);
     }
   } catch (error) {
     res.status(500).send({
       message:
-        'Um erro ocorreu ao atualizar o local. Tente novamente mais tarde.' 
+        'Um erro ocorreu ao atualizar o local. Tente novamente mais tarde.',
     });
   }
 };
