@@ -5,6 +5,7 @@ const tagSchema = mongoose.Schema({
   name: String,
   color: String,
   icon: String,
+  type: String,
 });
 
 const tagModel = mongoose.model('tag', tagSchema);

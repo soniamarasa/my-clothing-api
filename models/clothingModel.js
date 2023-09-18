@@ -5,7 +5,6 @@ const clothingSchema = mongoose.Schema({
   name: String,
   color: String,
   inactive: Boolean,
-  type: Object,
   category: Object,
   tag: Object,
 });

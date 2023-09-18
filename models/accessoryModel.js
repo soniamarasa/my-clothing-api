@@ -4,8 +4,7 @@ const accessoriesSchema = mongoose.Schema({
   userId: String,
   name: String,
   color: String,
-  icon: String,
-  type: Object,
+  category: Object,
 });
 
 const accessoriesModel = mongoose.model('accessories', accessoriesSchema);

@@ -4,7 +4,7 @@ const shoeSchema = mongoose.Schema({
   userId: String,
   name: String,
   color: String,
-  type: Object,
+  category: Object,
   // icon: String,
 });
 
