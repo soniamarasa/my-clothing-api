@@ -8,10 +8,16 @@ const getCategories = async (req, res) => {
       userId: userId,
     })
     res.send(categories);
-  } catch (error) {
-    res.send(500).send({
-      message: 'Ocorreu um erro ao pesquisar as categorias.' + error,
-    });
+  } catch (error)  {
+    if (error.message.includes("Unauthorized")) {
+      res.status(401).send({
+        message: 'Não autorizado. ' + error.message
+      });
+    } else {
+      res.status(500).send({
+        message: 'Ocorreu um erro ao pesquisar as categorias. ' + error.message
+      });
+    }
   }
 };
 

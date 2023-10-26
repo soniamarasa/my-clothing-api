@@ -4,12 +4,10 @@ const lookSchema = mongoose.Schema({
   userId: String,
   bottom: Object,
   top: Object, 
+  garb: Object,
   shoe: Object, 
-  dress: Object,
-  accessory: Array,
-  handbag: Object,
   bandana: Object,
-  coat: Object
+  accessories: Array,
 });
 
 const lookModel = mongoose.model('look', lookSchema);

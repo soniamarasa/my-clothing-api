@@ -84,19 +84,7 @@ const login = async (req, res) => {
 };
 
 const logout = async (req, res) => {
-  const userId = req.userId;
-
-  const userExists = await userModel.findById({
-    _id: userId,
-  });
-
-  if (!userExists)
-    return res.status(400).json({ error: 'Usuário não existe!' });
-  else {
-    return res.json({
-      user: null,
-    });
-  }
+  return res.status(200).json({ user: null });
 };
 
 const getUser = async (req, res) => {
@@ -282,19 +270,31 @@ const resetPassword = async (req, res) => {
 const authorization = async (req, res, next) => {
   const token = req.headers['authorization'];
 
-  if (!token)
+  if (!token) {
     return res
       .status(401)
       .json({ auth: false, message: 'Nenhum token fornecido.' });
+  }
 
   jwt.verify(token, process.env.SECRET, function (err, decoded) {
-    if (err)
+    if (err) {
+      console.log(err);
+      if (err.name === 'TokenExpiredError') {
+        return res
+          .status(401)
+          .json({ auth: false, message: 'Token expirado.' });
+      }
+      if (err.name === 'JsonWebTokenError') {
+        return res
+          .status(401)
+          .json({ auth: false, message: 'Token inválido.' });
+      }
       return res
         .status(401)
         .json({ auth: false, message: 'Falha ao autenticar o token.' });
+    }
 
     req.userId = decoded._id;
-
     next();
   });
 };

@@ -6,6 +6,7 @@ const tagSchema = mongoose.Schema({
   color: String,
   icon: String,
   type: String,
+  clothesType: Number,
 });
 
 const tagModel = mongoose.model('tag', tagSchema);
