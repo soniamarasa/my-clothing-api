@@ -17,6 +17,7 @@ import placeRouter from './routes/place.routes.js';
 import plannedLooksRouter from './routes/plannedLook.routes.js';
 import shoeRouter from './routes/shoe.routes.js';
 import tagsRouter from './routes/tag.routes.js';
+import dashboardRouter from './routes/dashboard.routes.js';
 
 dotenv.config();
 const app = express();
@@ -52,4 +53,5 @@ app.use('/api', looksRouter);
 app.use('/api', placeRouter);
 app.use('/api', plannedLooksRouter);
 app.use('/api', shoeRouter);
-app.use('/api', tagsRouter);
+app.use('/api', tagsRouter); 
+app.use('/api', dashboardRouter); 
