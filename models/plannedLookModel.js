@@ -6,9 +6,10 @@ const plannedLookSchema = mongoose.Schema({
   date: Date,
   status: Object,
   place: Object,
-  tag: Object,
   coat: Object,
   handbag: Object,
+  bandana: Object,
+  accessories: Array,
 });
 
 const plannedLookModel = mongoose.model('plannedLook', plannedLookSchema);

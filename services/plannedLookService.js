@@ -2,9 +2,13 @@ import plannedLookModel from '../models/plannedLookModel.js';
 
 const getPlannedLooks = async (req, res) => {
   const userId = req.userId;
+  const status = parseInt(req.query.status, 10); 
+
+
   try {
     const plannedLooks = await plannedLookModel.find({
       userId: userId,
+      'status.id': status,
     });
     res.send(plannedLooks);
   } catch (error) {

@@ -93,7 +93,7 @@ const getDashboard = async (req, res) => {
         if (!itemUsage.looks[lookId]) {
           itemUsage.looks[lookId] = {
             id: lookId,
-            name: look.look.name || 'Look',
+            name: (look.look.garb ? look.look.garb.name : look.look.top.name + ' + ' + look.look.bottom.name)+ ' + ' + look.look.shoe.name ,
             count: 0,
           };
         }
@@ -119,32 +119,40 @@ const getDashboard = async (req, res) => {
     const dashboardData = {
       handbags: {
         total: handbags.length,
-        result: Object.values(itemUsage.handbags),
+        result: Object.values(itemUsage.handbags).sort(
+          (a, b) => b.count - a.count
+        ),
       },
       bottoms: {
         total: clothes.filter((c) => c.category._id.toString() === 'customC02')
           .length,
-        result: Object.values(itemUsage.bottoms),
+        result: Object.values(itemUsage.bottoms).sort(
+          (a, b) => b.count - a.count
+        ),
       },
       tops: {
         total: clothes.filter((c) => c.category._id.toString() === 'customC03')
           .length,
-        result: Object.values(itemUsage.tops),
+        result: Object.values(itemUsage.tops).sort((a, b) => b.count - a.count),
       },
       shoes: {
         total: shoes.length,
-        result: Object.values(itemUsage.shoes),
+        result: Object.values(itemUsage.shoes).sort(
+          (a, b) => b.count - a.count
+        ),
       },
       garbs: {
         total: clothes.filter((c) => c.category._id.toString() === 'customC01')
           .length,
-        result: Object.values(itemUsage.garbs),
+        result: Object.values(itemUsage.garbs).sort(
+          (a, b) => b.count - a.count
+        ),
       },
       totalLooks: {
         total: looks.length,
-        result: Object.values(itemUsage.looks).sort(
-          (a, b) => b.count - a.count
-        ),
+        result: Object.values(itemUsage.looks)
+          .sort((a, b) => b.count - a.count)
+          .slice(0, 5),
       },
     };
 

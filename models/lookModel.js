@@ -3,11 +3,10 @@ import mongoose from 'mongoose';
 const lookSchema = mongoose.Schema({
   userId: String,
   bottom: Object,
-  top: Object, 
+  top: Object,
   garb: Object,
-  shoe: Object, 
-  bandana: Object,
-  accessories: Array,
+  shoe: Object,
+  tag: Object,
 });
 
 const lookModel = mongoose.model('look', lookSchema);
