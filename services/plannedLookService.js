@@ -2,13 +2,17 @@ import plannedLookModel from '../models/plannedLookModel.js';
 
 const getPlannedLooks = async (req, res) => {
   const userId = req.userId;
-  const status = parseInt(req.query.status, 10); 
-
+  const status = parseInt(req.query.status, 10);
+  const filterYear = req.query.year;
 
   try {
     const plannedLooks = await plannedLookModel.find({
       userId: userId,
       'status.id': status,
+      date: {
+        $gte: new Date(`${filterYear}-01-01`),
+        $lte: new Date(`${filterYear}-12-31`),
+      },
     });
     res.send(plannedLooks);
   } catch (error) {
@@ -31,7 +35,7 @@ const newPlannedLook = async (req, res) => {
   } catch (error) {
     res.status(500).send({
       message:
-        'Um erro ocorreu ao planejar o look. Tente novamente mais tarde. '
+        'Um erro ocorreu ao planejar o look. Tente novamente mais tarde. ',
     });
   }
 };
@@ -67,13 +71,12 @@ const updatePlannedLook = async (req, res) => {
         message: 'Look planejado não encontrado',
       });
     } else {
-
       res.send(plannedLook);
     }
   } catch (error) {
     res.status(500).send({
       message:
-        'Um erro ocorreu ao atualizar o look planejado. Tente novamente mais tarde.' 
+        'Um erro ocorreu ao atualizar o look planejado. Tente novamente mais tarde.',
     });
   }
 };
@@ -111,4 +114,9 @@ const deletePlannedLook = async (req, res) => {
   }
 };
 
-export { getPlannedLooks, newPlannedLook, updatePlannedLook, deletePlannedLook };
+export {
+  getPlannedLooks,
+  newPlannedLook,
+  updatePlannedLook,
+  deletePlannedLook,
+};
