@@ -13,14 +13,16 @@ const getPlannedLooks = async (req, res) => {
         $gte: new Date(`${filterYear}-01-01`),
         $lte: new Date(`${filterYear}-12-31`),
       },
-    });
+    }).sort({ date: -1 }); 
+
     res.send(plannedLooks);
   } catch (error) {
-    res.send(500).send({
-      message: 'Ocorreu um erro ao pesquisar os looks planejados.' + error,
+    res.status(500).send({
+      message: 'Ocorreu um erro ao pesquisar os looks planejados. ' + error,
     });
   }
 };
+
 
 const newPlannedLook = async (req, res) => {
   const plannedLookBody = req.body;
