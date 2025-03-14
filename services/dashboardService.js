@@ -2,6 +2,7 @@ import handbagModel from '../models/handbagModel.js';
 import plannedLookModel from '../models/plannedLookModel.js';
 import clothingModel from '../models/clothingModel.js';
 import shoeModel from '../models/shoeModel.js';
+import lookModel from '../models/lookModel.js';
 
 const getDashboard = async (req, res) => {
   const userId = req.userId;
@@ -93,7 +94,12 @@ const getDashboard = async (req, res) => {
         if (!itemUsage.looks[lookId]) {
           itemUsage.looks[lookId] = {
             id: lookId,
-            name: (look.look.garb ? look.look.garb.name : look.look.top.name + ' + ' + look.look.bottom.name)+ ' + ' + look.look.shoe.name ,
+            name:
+              (look.look.garb
+                ? look.look.garb.name
+                : look.look.top.name + ' + ' + look.look.bottom.name) +
+              ' + ' +
+              look.look.shoe.name,
             count: 0,
           };
         }
@@ -164,4 +170,51 @@ const getDashboard = async (req, res) => {
   }
 };
 
-export { getDashboard };
+const getUnusedLooks = async (req, res) => {
+  const userId = req.userId;
+
+  try {
+    const usedLooks = await plannedLookModel.distinct('look', {
+      userId: userId,
+      'status.id': 2,
+    });
+
+    const usedLookIds = usedLooks.map((look) => look._id.toString()); 
+
+    const allLooks = await lookModel.find({ userId: userId });
+
+    const unusedLooks = allLooks.filter((look) => {
+      return !usedLookIds.includes(look._id.toString());
+    });
+
+    res.send(unusedLooks);
+  } catch (error) {
+    res.status(500).send({
+      message:
+        'Ocorreu um erro ao pesquisar os looks não usados. ' + error.message,
+    });
+  }
+};
+
+const getNextPlannedLook = async (req, res) => {
+  const userId = req.userId;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  try {
+    const nextPlannedLook = await plannedLookModel
+      .findOne({
+        userId: userId,
+        date: { $gte: today },
+      })
+      .sort({ date: 1 });
+
+    res.send(nextPlannedLook ? [nextPlannedLook] : []);
+  } catch (error) {
+    res.status(500).send({
+      message: 'Ocorreu um erro ao buscar o próximo look planejado. ' + error,
+    });
+  }
+};
+
+export { getDashboard, getUnusedLooks, getNextPlannedLook };

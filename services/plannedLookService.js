@@ -6,14 +6,16 @@ const getPlannedLooks = async (req, res) => {
   const filterYear = req.query.year;
 
   try {
-    const plannedLooks = await plannedLookModel.find({
-      userId: userId,
-      'status.id': status,
-      date: {
-        $gte: new Date(`${filterYear}-01-01`),
-        $lte: new Date(`${filterYear}-12-31`),
-      },
-    }).sort({ date: -1 }); 
+    const plannedLooks = await plannedLookModel
+      .find({
+        userId: userId,
+        'status.id': status,
+        date: {
+          $gte: new Date(`${filterYear}-01-01`),
+          $lte: new Date(`${filterYear}-12-31`),
+        },
+      })
+      .sort({ date: -1 });
 
     res.send(plannedLooks);
   } catch (error) {
@@ -22,7 +24,6 @@ const getPlannedLooks = async (req, res) => {
     });
   }
 };
-
 
 const newPlannedLook = async (req, res) => {
   const plannedLookBody = req.body;
