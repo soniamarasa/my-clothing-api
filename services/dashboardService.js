@@ -2,7 +2,6 @@ import handbagModel from '../models/handbagModel.js';
 import plannedLookModel from '../models/plannedLookModel.js';
 import clothingModel from '../models/clothingModel.js';
 import shoeModel from '../models/shoeModel.js';
-import lookModel from '../models/lookModel.js';
 
 const getDashboard = async (req, res) => {
   const userId = req.userId;
@@ -170,31 +169,8 @@ const getDashboard = async (req, res) => {
   }
 };
 
-const getUnusedLooks = async (req, res) => {
-  const userId = req.userId;
 
-  try {
-    const usedLooks = await plannedLookModel.distinct('look', {
-      userId: userId,
-      'status.id': 2,
-    });
 
-    const usedLookIds = usedLooks.map((look) => look._id.toString()); 
-
-    const allLooks = await lookModel.find({ userId: userId });
-
-    const unusedLooks = allLooks.filter((look) => {
-      return !usedLookIds.includes(look._id.toString());
-    });
-
-    res.send(unusedLooks);
-  } catch (error) {
-    res.status(500).send({
-      message:
-        'Ocorreu um erro ao pesquisar os looks não usados. ' + error.message,
-    });
-  }
-};
 
 const getNextPlannedLook = async (req, res) => {
   const userId = req.userId;
@@ -217,4 +193,4 @@ const getNextPlannedLook = async (req, res) => {
   }
 };
 
-export { getDashboard, getUnusedLooks, getNextPlannedLook };
+export { getDashboard, getNextPlannedLook };

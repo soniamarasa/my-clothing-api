@@ -1,4 +1,5 @@
 import lookModel from '../models/lookModel.js';
+import plannedLookModel from '../models/plannedLookModel.js';
 
 const getLooks = async (req, res) => {
   const userId = req.userId;
@@ -107,4 +108,40 @@ const deleteLook = async (req, res) => {
   }
 };
 
-export { getLooks, newLook, updateLook, deleteLook };
+const getUnusedLooks = async (req, res) => {
+  const userId = req.userId;
+  const yearParam = req.query.year;
+  const year = yearParam ? parseInt(yearParam) : new Date().getFullYear();
+
+  if (isNaN(year)) {
+    return res.status(400).send({ message: 'Ano inválido.' });
+  }
+
+  const startOfYear = new Date(`${year}-01-01T00:00:00.000Z`);
+  const endOfYear = new Date(`${year}-12-31T23:59:59.999Z`);
+
+  try {
+    const usedLooks = await plannedLookModel.distinct('look', {
+      userId: userId,
+      'status.id': 2,
+      date: { $gte: startOfYear, $lte: endOfYear },
+    });
+
+    const usedLookIds = usedLooks.map((look) => look._id.toString());
+
+    const allLooks = await lookModel.find({ userId: userId });
+
+    const unusedLooks = allLooks.filter((look) => {
+      return !usedLookIds.includes(look._id.toString());
+    });
+
+    res.send(unusedLooks);
+  } catch (error) {
+    res.status(500).send({
+      message:
+        'Ocorreu um erro ao pesquisar os looks não usados. ' + error.message,
+    });
+  }
+};
+
+export { getLooks, newLook, updateLook, deleteLook, getUnusedLooks };
