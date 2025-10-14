@@ -129,15 +129,19 @@ const getDashboard = async (req, res) => {
         ),
       },
       bottoms: {
-        total: clothes.filter((c) => c.category._id.toString() === 'customC02')
-          .length,
+        total: clothes.filter(
+          (c) =>
+            c.category._id.toString() === 'customC02' && c.inactive === false
+        ).length,
         result: Object.values(itemUsage.bottoms).sort(
           (a, b) => b.count - a.count
         ),
       },
       tops: {
-        total: clothes.filter((c) => c.category._id.toString() === 'customC03')
-          .length,
+        total: clothes.filter(
+          (c) =>
+            c.category._id.toString() === 'customC03' && c.inactive === false
+        ).length,
         result: Object.values(itemUsage.tops).sort((a, b) => b.count - a.count),
       },
       shoes: {
@@ -147,8 +151,10 @@ const getDashboard = async (req, res) => {
         ),
       },
       garbs: {
-        total: clothes.filter((c) => c.category._id.toString() === 'customC01')
-          .length,
+        total: clothes.filter(
+          (c) =>
+            c.category._id.toString() === 'customC01' && c.inactive === false
+        ).length,
         result: Object.values(itemUsage.garbs).sort(
           (a, b) => b.count - a.count
         ),
@@ -169,9 +175,6 @@ const getDashboard = async (req, res) => {
   }
 };
 
-
-
-
 const getNextPlannedLook = async (req, res) => {
   const userId = req.userId;
   const today = new Date();
@@ -182,6 +185,7 @@ const getNextPlannedLook = async (req, res) => {
       .findOne({
         userId: userId,
         date: { $gte: today },
+        'status.id': 1,
       })
       .sort({ date: 1 });
 

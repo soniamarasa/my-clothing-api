@@ -2,14 +2,20 @@ import clothingModel from '../models/clothingModel.js';
 
 const getClothes = async (req, res) => {
   const userId = req.userId;
+  const categoryId = req.query.categoryId;
+
   try {
-    const clothes = await clothingModel.find({
-      userId: userId,
-    });
+    const query = { userId: userId };
+
+    if (categoryId) {
+      query['category._id'] = categoryId;
+    }
+
+    const clothes = await clothingModel.find(query);
     res.send(clothes);
   } catch (error) {
-    res.send(500).send({
-      message: 'Ocorreu um erro ao pesquisar as roupas.' + error,
+    res.status(500).send({
+      message: 'Ocorreu um erro ao pesquisar as roupas. ' + error,
     });
   }
 };
@@ -26,8 +32,7 @@ const newClothing = async (req, res) => {
     res.send(clothing);
   } catch (error) {
     res.status(500).send({
-      message:
-        'Um erro ocorreu ao criar a roupa. Tente novamente mais tarde. '
+      message: 'Um erro ocorreu ao criar a roupa. Tente novamente mais tarde. ',
     });
   }
 };
@@ -63,13 +68,12 @@ const updateClothing = async (req, res) => {
         message: 'Roupa não encontrada',
       });
     } else {
-
       res.send(clothing);
     }
   } catch (error) {
     res.status(500).send({
       message:
-        'Um erro ocorreu ao atualizar a roupa. Tente novamente mais tarde.' 
+        'Um erro ocorreu ao atualizar a roupa. Tente novamente mais tarde.',
     });
   }
 };

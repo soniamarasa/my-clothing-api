@@ -6,6 +6,7 @@ const categorySchema = mongoose.Schema({
   icon: String,
   color: String,
   type: String,
+  clothesType: Number,
 });
 
 const categoryModel = mongoose.model('category', categorySchema);
