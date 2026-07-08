@@ -18,8 +18,10 @@ import plannedLooksRouter from './routes/plannedLook.routes.js';
 import shoeRouter from './routes/shoe.routes.js';
 import tagsRouter from './routes/tag.routes.js';
 import dashboardRouter from './routes/dashboard.routes.js';
+import { ensureIndexes } from './db/indexes.js';
 
 dotenv.config();
+
 const app = express();
 const corsOptions = {
   origin: '*',
@@ -28,19 +30,36 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(express.json());
 
-const { DB_CONNECTION } = process.env;
+const DB_CONNECTION = process.env.DB_CONNECTION?.trim().replace(/^["']|["']$/g, '');
+const APP_PORT = process.env.PORT?.trim() || 3001;
+
+if (!DB_CONNECTION) {
+  console.error('Erro: defina DB_CONNECTION no arquivo .env');
+  process.exit(1);
+}
+
+mongoose.connection.on('error', (error) => {
+  console.error('Erro na conexão MongoDB:', error.message);
+});
 
 mongoose
-  .connect(DB_CONNECTION, { useNewUrlParser: true, useUnifiedTopology: true })
-  .catch((error) => console.error('Erro na conexão MongoDB' + error));
-
-mongoose.connection.once('open', () => {
-  console.log('Conectado ao MongoDB');
-  const APP_PORT = process.env.PORT;
-  app.listen(APP_PORT, () => {
-    console.log('Servidor foi iniciado na porta:' + APP_PORT);
+  .connect(DB_CONNECTION)
+  .then(async () => {
+    console.log('Conectado ao MongoDB');
+    await ensureIndexes();
+    app.listen(APP_PORT, () => {
+      console.log(`Servidor foi iniciado na porta: ${APP_PORT}`);
+    });
+  })
+  .catch((error) => {
+    console.error('Erro na conexão MongoDB:', error.message);
+    if (error.message.includes('querySrv ECONNREFUSED')) {
+      console.error(
+        'Dica: no Windows, troque mongodb+srv:// por mongodb:// (connection string padrão do Atlas). Veja .env.example'
+      );
+    }
+    process.exit(1);
   });
-});
 
 app.use('/api', authRoutes);
 app.use('/api', userRoutes);
@@ -53,5 +72,5 @@ app.use('/api', looksRouter);
 app.use('/api', placeRouter);
 app.use('/api', plannedLooksRouter);
 app.use('/api', shoeRouter);
-app.use('/api', tagsRouter); 
-app.use('/api', dashboardRouter); 
+app.use('/api', tagsRouter);
+app.use('/api', dashboardRouter);

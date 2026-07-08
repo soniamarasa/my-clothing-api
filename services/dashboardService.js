@@ -3,167 +3,174 @@ import plannedLookModel from '../models/plannedLookModel.js';
 import clothingModel from '../models/clothingModel.js';
 import shoeModel from '../models/shoeModel.js';
 
-const getDashboard = async (req, res) => {
-  const userId = req.userId;
-  const filterYear = req.query.year;
+const CATEGORY = {
+  GARB: 'customC01',
+  BOTTOM: 'customC02',
+  TOP: 'customC03',
+};
 
-  try {
-    const handbags = await handbagModel.find({ userId: userId });
-    const clothes = await clothingModel.find({ userId: userId });
-    const shoes = await shoeModel.find({ userId: userId });
+const buildYearRange = (year) => ({
+  $gte: new Date(`${year}-01-01T00:00:00.000Z`),
+  $lte: new Date(`${year}-12-31T23:59:59.999Z`),
+});
 
-    const looks = await plannedLookModel.find({
-      userId: userId,
-      'status.id': 2,
-      date: {
-        $gte: new Date(`${filterYear}-01-01`),
-        $lte: new Date(`${filterYear}-12-31`),
-      },
-    });
+const countActiveByCategory = (clothes) => {
+  const totals = { [CATEGORY.GARB]: 0, [CATEGORY.BOTTOM]: 0, [CATEGORY.TOP]: 0 };
 
-    const itemUsage = {
-      handbags: {},
-      bottoms: {},
-      tops: {},
-      shoes: {},
-      garbs: {},
-      looks: {},
-    };
+  for (const item of clothes) {
+    if (item.inactive) continue;
+    const categoryId = item.category?._id?.toString();
+    if (categoryId && totals[categoryId] !== undefined) {
+      totals[categoryId] += 1;
+    }
+  }
 
-    looks.forEach((look) => {
-      if (look.handbag) {
-        const handbagId = look.handbag._id.toString();
-        if (!itemUsage.handbags[handbagId]) {
-          itemUsage.handbags[handbagId] = {
-            id: handbagId,
-            name: look.handbag.name,
-            count: 0,
-          };
-        }
-        itemUsage.handbags[handbagId].count += 1;
-      }
+  return totals;
+};
 
-      if (look.look) {
-        if (
-          look.look.bottom &&
-          look.look.bottom.category._id.toString() === 'customC02'
-        ) {
-          const bottomId = look.look.bottom._id.toString();
-          if (!itemUsage.bottoms[bottomId]) {
-            itemUsage.bottoms[bottomId] = {
-              id: bottomId,
-              name: look.look.bottom.name,
-              count: 0,
-            };
-          }
-          itemUsage.bottoms[bottomId].count += 1;
-        }
+const aggregateUsageFromLooks = (looks) => {
+  const itemUsage = {
+    handbags: {},
+    bottoms: {},
+    tops: {},
+    shoes: {},
+    garbs: {},
+    looks: {},
+  };
 
-        if (
-          look.look.top &&
-          look.look.top.category._id.toString() === 'customC03'
-        ) {
-          const topId = look.look.top._id.toString();
-          if (!itemUsage.tops[topId]) {
-            itemUsage.tops[topId] = {
-              id: topId,
-              name: look.look.top.name,
-              count: 0,
-            };
-          }
-          itemUsage.tops[topId].count += 1;
-        }
-
-        if (
-          look.look.garb &&
-          look.look.garb.category._id.toString() === 'customC01'
-        ) {
-          const garbId = look.look.garb._id.toString();
-          if (!itemUsage.garbs[garbId]) {
-            itemUsage.garbs[garbId] = {
-              id: garbId,
-              name: look.look.garb.name,
-              count: 0,
-            };
-          }
-          itemUsage.garbs[garbId].count += 1;
-        }
-
-        const lookId = look.look._id.toString();
-        if (!itemUsage.looks[lookId]) {
-          itemUsage.looks[lookId] = {
-            id: lookId,
-            name:
-              (look.look.garb
-                ? look.look.garb.name
-                : look.look.top.name + ' + ' + look.look.bottom.name) +
-              ' + ' +
-              look.look.shoe.name,
-            count: 0,
-          };
-        }
-        itemUsage.looks[lookId].count += 1;
-      }
-    });
-
-    shoes.forEach((shoe) => {
-      const shoeId = shoe._id.toString();
-      const shoeCount = looks.filter(
-        (look) => look.look.shoe && look.look.shoe._id.toString() === shoeId
-      ).length;
-
-      if (shoeCount > 0) {
-        itemUsage.shoes[shoeId] = {
-          id: shoeId,
-          name: shoe.name,
-          count: shoeCount,
+  for (const plannedLook of looks) {
+    if (plannedLook.handbag) {
+      const handbagId = plannedLook.handbag._id.toString();
+      if (!itemUsage.handbags[handbagId]) {
+        itemUsage.handbags[handbagId] = {
+          id: handbagId,
+          name: plannedLook.handbag.name,
+          count: 0,
         };
       }
-    });
+      itemUsage.handbags[handbagId].count += 1;
+    }
+
+    const look = plannedLook.look;
+    if (!look) continue;
+
+    if (look.bottom?.category?._id?.toString() === CATEGORY.BOTTOM) {
+      const bottomId = look.bottom._id.toString();
+      if (!itemUsage.bottoms[bottomId]) {
+        itemUsage.bottoms[bottomId] = {
+          id: bottomId,
+          name: look.bottom.name,
+          count: 0,
+        };
+      }
+      itemUsage.bottoms[bottomId].count += 1;
+    }
+
+    if (look.top?.category?._id?.toString() === CATEGORY.TOP) {
+      const topId = look.top._id.toString();
+      if (!itemUsage.tops[topId]) {
+        itemUsage.tops[topId] = {
+          id: topId,
+          name: look.top.name,
+          count: 0,
+        };
+      }
+      itemUsage.tops[topId].count += 1;
+    }
+
+    if (look.garb?.category?._id?.toString() === CATEGORY.GARB) {
+      const garbId = look.garb._id.toString();
+      if (!itemUsage.garbs[garbId]) {
+        itemUsage.garbs[garbId] = {
+          id: garbId,
+          name: look.garb.name,
+          count: 0,
+        };
+      }
+      itemUsage.garbs[garbId].count += 1;
+    }
+
+    if (look.shoe) {
+      const shoeId = look.shoe._id.toString();
+      if (!itemUsage.shoes[shoeId]) {
+        itemUsage.shoes[shoeId] = {
+          id: shoeId,
+          name: look.shoe.name,
+          count: 0,
+        };
+      }
+      itemUsage.shoes[shoeId].count += 1;
+    }
+
+    const lookId = look._id.toString();
+    if (!itemUsage.looks[lookId]) {
+      itemUsage.looks[lookId] = {
+        id: lookId,
+        name:
+          (look.garb
+            ? look.garb.name
+            : `${look.top?.name} + ${look.bottom?.name}`) +
+          ' + ' +
+          look.shoe?.name,
+        count: 0,
+      };
+    }
+    itemUsage.looks[lookId].count += 1;
+  }
+
+  return itemUsage;
+};
+
+const sortByCount = (items) =>
+  Object.values(items).sort((a, b) => b.count - a.count);
+
+const getDashboard = async (req, res) => {
+  const userId = req.userId;
+  const filterYear =
+    req.query.year?.toString() || new Date().getFullYear().toString();
+
+  try {
+    const [handbags, clothes, shoes, looks] = await Promise.all([
+      handbagModel.find({ userId }).select('_id').lean(),
+      clothingModel.find({ userId }).select('inactive category').lean(),
+      shoeModel.find({ userId }).select('_id').lean(),
+      plannedLookModel
+        .find({
+          userId,
+          'status.id': 2,
+          date: buildYearRange(filterYear),
+        })
+        .select('look handbag')
+        .lean(),
+    ]);
+
+    const itemUsage = aggregateUsageFromLooks(looks);
+    const categoryTotals = countActiveByCategory(clothes);
 
     const dashboardData = {
       handbags: {
         total: handbags.length,
-        result: Object.values(itemUsage.handbags).sort(
-          (a, b) => b.count - a.count
-        ),
+        result: sortByCount(itemUsage.handbags),
       },
       bottoms: {
-        total: clothes.filter(
-          (c) =>
-            c.category._id.toString() === 'customC02' && c.inactive === false
-        ).length,
-        result: Object.values(itemUsage.bottoms).sort(
-          (a, b) => b.count - a.count
-        ),
+        total: categoryTotals[CATEGORY.BOTTOM],
+        result: sortByCount(itemUsage.bottoms),
       },
       tops: {
-        total: clothes.filter(
-          (c) =>
-            c.category._id.toString() === 'customC03' && c.inactive === false
-        ).length,
-        result: Object.values(itemUsage.tops).sort((a, b) => b.count - a.count),
+        total: categoryTotals[CATEGORY.TOP],
+        result: sortByCount(itemUsage.tops),
       },
       shoes: {
         total: shoes.length,
-        result: Object.values(itemUsage.shoes).sort(
-          (a, b) => b.count - a.count
-        ),
+        result: sortByCount(itemUsage.shoes),
       },
       garbs: {
-        total: clothes.filter(
-          (c) =>
-            c.category._id.toString() === 'customC01' && c.inactive === false
-        ).length,
-        result: Object.values(itemUsage.garbs).sort(
-          (a, b) => b.count - a.count
-        ),
+        total: categoryTotals[CATEGORY.GARB],
+        result: sortByCount(itemUsage.garbs),
       },
       totalLooks: {
         total: looks.length,
-        result: Object.values(itemUsage.looks)
-          .sort((a, b) => b.count - a.count)
-          .slice(0, 5),
+        result: sortByCount(itemUsage.looks).slice(0, 5),
       },
     };
 
@@ -183,11 +190,12 @@ const getNextPlannedLook = async (req, res) => {
   try {
     const nextPlannedLook = await plannedLookModel
       .findOne({
-        userId: userId,
+        userId,
         date: { $gte: today },
         'status.id': 1,
       })
-      .sort({ date: 1 });
+      .sort({ date: 1 })
+      .lean();
 
     res.send(nextPlannedLook ? [nextPlannedLook] : []);
   } catch (error) {
