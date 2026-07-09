@@ -1,6 +1,7 @@
 import { HttpError } from './HttpError.js';
 import { assertSameUser, sanitizeResourceBody } from './ownership.js';
 import { validate } from '../validators/index.js';
+import { parsePagination } from './pagination.js';
 
 export function makeResourceHandlers({
   model,
@@ -14,6 +15,27 @@ export function makeResourceHandlers({
       const query = listQueryBuilder
         ? listQueryBuilder(req)
         : { userId: req.userId };
+      const pagination = parsePagination(req.query);
+
+      if (pagination) {
+        const [items, total] = await Promise.all([
+          model
+            .find(query)
+            .skip(pagination.skip)
+            .limit(pagination.limit)
+            .sort({ _id: -1 }),
+          model.countDocuments(query),
+        ]);
+
+        return res.json({
+          items,
+          total,
+          page: pagination.page,
+          limit: pagination.limit,
+          totalPages: Math.ceil(total / pagination.limit) || 1,
+        });
+      }
+
       const items = await model.find(query);
       res.json(items);
     } catch (error) {
