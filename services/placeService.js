@@ -1,108 +1,24 @@
 import placeModel from '../models/placeModel.js';
+import { placeSchema } from '../validators/index.js';
+import { makeResourceHandlers } from '../utils/resourceHandlers.js';
 
-const getPlaces = async (req, res) => {
-  const userId = req.userId;
-  try {
-    const places = await placeModel.find({
-      userId: userId,
-    });
-    res.send(places);
-  } catch (error) {
-    res.send(500).send({
-      message: 'Ocorreu um erro ao pesquisar os locais.' + error,
-    });
-  }
+const labels = {
+  notFound: 'Local não encontrado.',
+  forbiddenEdit: 'Você não tem permissão para editar esse local.',
+  forbiddenDelete: 'Você não tem permissão para deletar esse local.',
+  deleted: 'Local deletado com sucesso!',
 };
 
-const newPlace = async (req, res) => {
-  const placeBody = req.body;
+const { list, create, update, remove } = makeResourceHandlers({
+  model: placeModel,
+  createSchema: placeSchema,
+  updateSchema: placeSchema,
+  labels,
+});
 
-  let place = new placeModel(placeBody);
-  place.userId = req.userId;
-
-  try {
-    await place.save();
-
-    res.send(place);
-  } catch (error) {
-    res.status(500).send({
-      message: 'Um erro ocorreu ao criar o local. Tente novamente mais tarde. ',
-    });
-  }
+export {
+  list as getPlaces,
+  create as newPlace,
+  update as updatePlace,
+  remove as deletePlace,
 };
-
-const updatePlace = async (req, res) => {
-  const userId = req.userId;
-  const id = req.params.id;
-  const placeBody = req.body;
-
-  try {
-    const item = await placeModel.findById({
-      _id: id,
-    });
-
-    if (item.userId !== userId) {
-      return res.status(500).send({
-        message: 'Você nao tem permissão para editar esse local.',
-      });
-    }
-
-    let place = await placeModel.findByIdAndUpdate(
-      {
-        _id: id,
-      },
-      placeBody,
-      {
-        new: true,
-      }
-    );
-
-    if (!place) {
-      res.send({
-        message: 'Local não encontrado',
-      });
-    } else {
-      res.send(place);
-    }
-  } catch (error) {
-    res.status(500).send({
-      message:
-        'Um erro ocorreu ao atualizar o local. Tente novamente mais tarde.',
-    });
-  }
-};
-
-const deletePlace = async (req, res) => {
-  const id = req.params.id;
-  const userId = req.userId;
-
-  try {
-    const place = await placeModel.findById({
-      _id: id,
-    });
-    if (place.userId !== userId) {
-      return res.status(500).send({
-        message: 'Você não tem permissão para deletar esse local.',
-      });
-    }
-
-    const dataId = await placeModel.findByIdAndRemove({
-      _id: id,
-    });
-    if (!dataId) {
-      res.send({
-        message: 'Local não encontrado.',
-      });
-    } else {
-      res.send({ message: 'Local deletado com sucesso!' });
-    }
-  } catch (error) {
-    res.status(500).send({
-      message:
-        'Um erro ocorreu ao deletar o local. Tente novamente mais tarde.' +
-        error,
-    });
-  }
-};
-
-export { getPlaces, newPlace, updatePlace, deletePlace };
