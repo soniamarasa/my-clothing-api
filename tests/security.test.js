@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { assertSameUser, sanitizeResourceBody } from '../utils/ownership.js';
 import { HttpError } from '../utils/HttpError.js';
-import { validate, inventorySchema, tagSchema } from '../validators/index.js';
+import { validate, inventorySchema, tagSchema, lookSchema } from '../validators/index.js';
 
 test('assertSameUser allows matching ids', () => {
   assert.doesNotThrow(() => assertSameUser('abc', 'abc'));
@@ -47,6 +47,37 @@ test('validate accepts valid tag payload', async () => {
   });
 
   assert.equal(result.name, 'Casual');
+});
+
+test('validate preserves embedded category on inventory payload', async () => {
+  const result = await validate(inventorySchema, {
+    name: 'Brinco',
+    color: '#ffcc00',
+    category: {
+      _id: 'customC06',
+      name: 'Anel',
+      icon: '💍',
+      color: '#a7e6f2',
+    },
+  });
+
+  assert.equal(result.name, 'Brinco');
+  assert.equal(result.category._id, 'customC06');
+  assert.equal(result.category.name, 'Anel');
+});
+
+test('validate preserves embedded look parts', async () => {
+  const result = await validate(lookSchema, {
+    top: { _id: 't1', name: 'Blusa' },
+    bottom: { _id: 'b1', name: 'Calça' },
+    shoe: { _id: 's1', name: 'Tênis' },
+    tag: { _id: 'tag1', name: 'Casual' },
+  });
+
+  assert.equal(result.top.name, 'Blusa');
+  assert.equal(result.bottom.name, 'Calça');
+  assert.equal(result.shoe.name, 'Tênis');
+  assert.equal(result.tag.name, 'Casual');
 });
 
 test('HttpError carries status code', () => {

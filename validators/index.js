@@ -1,12 +1,15 @@
 import * as Yup from 'yup';
 import { HttpError } from '../utils/HttpError.js';
 
+/** Objetos embutidos (category, tag, look, etc.) — Yup.object() com stripUnknown apaga as chaves internas. */
+const embedded = () => Yup.mixed().nullable();
+
 export const inventorySchema = Yup.object({
   name: Yup.string().trim().required(),
   color: Yup.string().trim().nullable(),
   inactive: Yup.boolean().nullable(),
-  category: Yup.object().nullable(),
-  tag: Yup.object().nullable(),
+  category: embedded(),
+  tag: embedded(),
 });
 
 export const tagSchema = Yup.object({
@@ -27,18 +30,22 @@ export const placeSchema = Yup.object({
 });
 
 export const lookSchema = Yup.object({
-  bottom: Yup.object().nullable(),
-  top: Yup.object().nullable(),
-  garb: Yup.object().nullable(),
-  shoe: Yup.object().nullable(),
-  tag: Yup.object().nullable(),
+  bottom: embedded(),
+  top: embedded(),
+  garb: embedded(),
+  shoe: embedded(),
+  tag: embedded(),
 });
 
 export const plannedLookSchema = Yup.object({
-  look: Yup.object().required(),
+  look: Yup.mixed().required(),
   date: Yup.date().required(),
-  place: Yup.object().nullable(),
-  status: Yup.object().nullable(),
+  place: embedded(),
+  status: embedded(),
+  coat: embedded(),
+  handbag: embedded(),
+  bandana: embedded(),
+  accessories: Yup.array().of(Yup.mixed()).default([]).nullable(),
 });
 
 export async function validate(schema, body) {
